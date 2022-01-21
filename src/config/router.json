@@ -1,0 +1,10 @@
+{
+    "defaultSubDomain": "www",
+    "defaultConfig": {
+        "/html/index.htm": { "all": "^\/$" },
+        "/html/": { "path": "^\/$", "file": "\\.htm$" }
+    },
+    "subDomain": {
+        "www": {}
+    }
+}
