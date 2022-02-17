@@ -12,13 +12,18 @@ const env = config({ safe: true });
 const router = new Router(env);
 const cache = new Cache();
 const runner = new Runner(env);
-const server = Deno.listenTls({
-  port: Number(env.PORT),
-  hostname: env.HOSTNAME,
-  certFile: env.SSL_CERT_PATH,
-  keyFile: env.SSL_PRIVATE_KEY_PATH,
-  alpnProtocols: ["h2", "http/1.1"],
-});
+const server = Number(env.ENABLE_SSL)
+  ? Deno.listenTls({
+    port: Number(env.PORT),
+    hostname: env.HOSTNAME,
+    certFile: env.SSL_CERT_PATH,
+    keyFile: env.SSL_PRIVATE_KEY_PATH,
+    alpnProtocols: ["h2", "http/1.1"],
+  })
+  : Deno.listen({
+    port: Number(env.PORT),
+    hostname: env.HOSTNAME,
+  });
 
 async function readFile(
   request: Request,
