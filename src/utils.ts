@@ -21,18 +21,4 @@ function createSubDomainConfig(config: any) { // create sub domain config from d
   return config;
 }
 
-function inject(
-  data: string,
-  tagToReplace: string,
-  replacementString: string,
-) {
-  return data.replace(
-    new RegExp(
-      `£[iI][nN][jJ][eE][cC][tT]{[ \t\n\r]*${tagToReplace.trim()}[ \t\n\r]}`,
-      "gm",
-    ),
-    replacementString,
-  );
-}
-
-export { createSubDomainConfig, getJson, getJsonSync, inject };
+export { createSubDomainConfig, getJson, getJsonSync };
