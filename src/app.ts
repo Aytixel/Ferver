@@ -1,5 +1,4 @@
 import { config } from "https://deno.land/x/dotenv@v3.2.0/mod.ts";
-import { exists } from "https://deno.land/std@0.126.0/fs/mod.ts";
 import { Router } from "./router.ts";
 import { Mime } from "./mime.ts";
 import { stream } from "./stream.ts";
@@ -79,30 +78,38 @@ async function handle(conn: Deno.Conn) {
     try {
       const { routerData, subDomainFound } = router.route(request);
 
-      if (subDomainFound && await exists(routerData.filePath)) {
-        const headers = {
-          "content-type": Mime.getMimeType(routerData.parsedPath.ext),
-        };
-        const { data, status } = await readFile(
-          request,
-          Mime.getReturnDataType(routerData.parsedPath.ext),
-          routerData,
-          headers,
-        );
-        const body = compress(
-          request,
-          data,
-          headers,
-        );
+      try {
+        Deno.close((await Deno.open(routerData.filePath)).rid);
 
-        if (cache.addCacheHeader(request, data, routerData, headers)) {
-          respondWith(new NotModified304()).catch(console.error);
-        } else {
-          const response = new Response(body, { headers, status });
+        if (
+          subDomainFound
+        ) {
+          const headers = {
+            "content-type": Mime.getMimeType(routerData.parsedPath.ext),
+          };
+          const { data, status } = await readFile(
+            request,
+            Mime.getReturnDataType(routerData.parsedPath.ext),
+            routerData,
+            headers,
+          );
+          const body = compress(
+            request,
+            data,
+            headers,
+          );
 
-          respondWith(response).catch(console.error);
-        }
-      } else respondWith(new Error404()).catch(console.error);
+          if (cache.addCacheHeader(request, data, routerData, headers)) {
+            respondWith(new NotModified304()).catch(console.error);
+          } else {
+            const response = new Response(body, { headers, status });
+
+            respondWith(response).catch(console.error);
+          }
+        } else respondWith(new Error404()).catch(console.error);
+      } catch (_) {
+        respondWith(new Error404()).catch(console.error);
+      }
     } catch (error) {
       respondWith(new Error500()).catch(console.error);
 
