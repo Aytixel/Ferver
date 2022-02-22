@@ -21,4 +21,22 @@ function createSubDomainConfig(config: any) { // create sub domain config from d
   return config;
 }
 
-export { createSubDomainConfig, getJson, getJsonSync };
+async function exists(path: string) {
+  try {
+    Deno.close((await Deno.open(path)).rid);
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
+function existsSync(path: string) {
+  try {
+    Deno.close(Deno.openSync(path).rid);
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
+export { createSubDomainConfig, exists, existsSync, getJson, getJsonSync };

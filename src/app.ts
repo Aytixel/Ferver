@@ -6,6 +6,7 @@ import { compress } from "./compress.ts";
 import { Cache } from "./cache.ts";
 import { Error404, Error500, NotModified304 } from "./status.ts";
 import { Runner } from "./runner.ts";
+import { exists } from "./utils.ts";
 
 const env = config({ safe: true });
 const router = new Router(env);
@@ -78,38 +79,30 @@ async function handle(conn: Deno.Conn) {
     try {
       const { routerData, subDomainFound } = router.route(request);
 
-      try {
-        Deno.close((await Deno.open(routerData.filePath)).rid);
+      if (subDomainFound && await exists(routerData.filePath)) {
+        const headers = {
+          "content-type": Mime.getMimeType(routerData.parsedPath.ext),
+        };
+        const { data, status } = await readFile(
+          request,
+          Mime.getReturnDataType(routerData.parsedPath.ext),
+          routerData,
+          headers,
+        );
+        const body = compress(
+          request,
+          data,
+          headers,
+        );
 
-        if (
-          subDomainFound
-        ) {
-          const headers = {
-            "content-type": Mime.getMimeType(routerData.parsedPath.ext),
-          };
-          const { data, status } = await readFile(
-            request,
-            Mime.getReturnDataType(routerData.parsedPath.ext),
-            routerData,
-            headers,
-          );
-          const body = compress(
-            request,
-            data,
-            headers,
-          );
+        if (cache.addCacheHeader(request, data, routerData, headers)) {
+          respondWith(new NotModified304()).catch(console.error);
+        } else {
+          const response = new Response(body, { headers, status });
 
-          if (cache.addCacheHeader(request, data, routerData, headers)) {
-            respondWith(new NotModified304()).catch(console.error);
-          } else {
-            const response = new Response(body, { headers, status });
-
-            respondWith(response).catch(console.error);
-          }
-        } else respondWith(new Error404()).catch(console.error);
-      } catch (_) {
-        respondWith(new Error404()).catch(console.error);
-      }
+          respondWith(response).catch(console.error);
+        }
+      } else respondWith(new Error404()).catch(console.error);
     } catch (error) {
       respondWith(new Error500()).catch(console.error);
 
