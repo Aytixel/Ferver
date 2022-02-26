@@ -1,4 +1,4 @@
-import { decompress } from "https://deno.land/x/brotli@v0.1.4/mod.ts";
+import { compress as brotli_compress } from "https://deno.land/x/brotli@v0.1.4/mod.ts";
 import { deflate, gzip } from "https://deno.land/x/denoflate@1.2.1/mod.ts";
 
 function compress(
@@ -24,7 +24,7 @@ function compress(
     headers["vary"] = "Accept-Encoding";
     headers["content-encoding"] = "br";
 
-    return decompress(data);
+    return brotli_compress(data);
   }
 
   return data;
