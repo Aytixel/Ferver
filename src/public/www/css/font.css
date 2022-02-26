@@ -1,0 +1,13 @@
+/*
+
+Example :
+
+    @font-face {
+        font-family: 'hello';
+        src: url('/resource/font/hello.woff2') format('woff2'),
+            url('/resource/font/hello.woff') format('woff');
+        font-weight: normal;
+        font-style: normal;
+    }
+
+*/
