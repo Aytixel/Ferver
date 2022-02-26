@@ -95,12 +95,12 @@ async function handle(conn: Deno.Conn) {
           headers,
         );
 
-        if (cache.addCacheHeader(request, data, routerData, headers)) {
+        if (cache.addCacheHeader(request, body, routerData, headers)) {
           respondWith(new NotModified304()).catch(console.error);
         } else {
-          const response = new Response(body, { headers, status });
-
-          respondWith(response).catch(console.error);
+          respondWith(new Response(body, { headers, status })).catch(
+            console.error,
+          );
         }
       } else respondWith(new Error404()).catch(console.error);
     } catch (error) {
