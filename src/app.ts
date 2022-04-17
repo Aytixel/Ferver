@@ -19,7 +19,7 @@ const server = Number(env.ENABLE_SSL)
     certFile: env.SSL_CERT_PATH,
     keyFile: env.SSL_PRIVATE_KEY_PATH,
     alpnProtocols: ["h2", "http/1.1"],
-  })
+  } as any)
   : Deno.listen({
     port: Number(env.PORT),
     hostname: env.HOSTNAME,
