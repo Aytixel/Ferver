@@ -1,5 +1,5 @@
 import { DotenvConfig } from "https://deno.land/x/dotenv@v3.2.0/mod.ts";
-import { join, resolve } from "https://deno.land/std@0.126.0/path/mod.ts";
+import { join, resolve } from "https://deno.land/std@0.152.0/path/posix.ts";
 import { existsSync } from "./utils.ts";
 
 class Runner {
