@@ -4,7 +4,7 @@ import { deflate, gzip } from "https://deno.land/x/compress@v0.4.4/mod.ts";
 function compress(
   request: Request,
   data: Uint8Array,
-  headers: any,
+  headers: Record<string, string>,
 ): Uint8Array {
   const acceptEncoding = request.headers.get("accept-encoding") || "";
 

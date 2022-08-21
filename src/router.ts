@@ -1,9 +1,34 @@
 import { DotenvConfig } from "https://deno.land/x/dotenv@v3.2.0/mod.ts";
-import { join, parse } from "https://deno.land/std@0.152.0/path/posix.ts";
 import { createSubDomainConfig, getJsonSync } from "./utils.ts";
+import {
+  join,
+  parse,
+  ParsedPath,
+} from "https://deno.land/std@0.152.0/path/mod.ts";
+
+interface SubDomainConfig {
+  all?: string;
+  file?: string;
+  path?: string;
+}
+
+interface RouterConfig {
+  defaultSubDomain: string;
+  defaultConfig: Record<string, Record<string, SubDomainConfig>>;
+  subDomain: Record<string, Record<string, SubDomainConfig>>;
+}
+
+interface RouterData {
+  url: URL;
+  searchParams: URLSearchParams;
+  subDomain: string;
+  domainFilePath: string;
+  filePath: string;
+  parsedPath: ParsedPath;
+}
 
 class Router {
-  private config: any;
+  private config: RouterConfig;
   private publicPath: string;
 
   constructor(env: DotenvConfig) {
@@ -14,17 +39,20 @@ class Router {
   }
 
   route(request: Request) {
-    const routerData: any = {
-      url: new URL(request.url),
+    const url = new URL(request.url);
+    const routerData: RouterData = {
+      url,
+      searchParams: new URLSearchParams(
+        url.search.substring(1),
+      ),
+      subDomain: url.hostname.split(".").slice(0, -2).join(
+        ".",
+      ),
+      domainFilePath: "",
+      filePath: "",
+      parsedPath: parse(""),
     };
     let subDomainFound = true;
-
-    routerData.searchParams = new URLSearchParams(
-      routerData.url.search.substring(1),
-    );
-    routerData.subDomain = routerData.url.hostname.split(".").slice(0, -2).join(
-      ".",
-    );
 
     if (routerData.subDomain == "") {
       routerData.subDomain = this.config.defaultSubDomain;
@@ -93,4 +121,5 @@ class Router {
   }
 }
 
+export type { RouterData };
 export { Router };

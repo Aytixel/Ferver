@@ -1,5 +1,5 @@
 import { config } from "https://deno.land/x/dotenv@v3.2.0/mod.ts";
-import { Router } from "./router.ts";
+import { Router, RouterData } from "./router.ts";
 import { Mime } from "./mime.ts";
 import { stream } from "./stream.ts";
 import { compress } from "./compress.ts";
@@ -28,10 +28,10 @@ const server = Number(env.ENABLE_SSL)
 async function readFile(
   request: Request,
   returnDataType: string,
-  routerData: any,
-  headers: any,
-): Promise<{ data: any; status: number }> {
-  let data: any = new Uint8Array();
+  routerData: RouterData,
+  headers: Record<string, string>,
+): Promise<{ data: Uint8Array; status: number }> {
+  let data = new Uint8Array();
   let status = 200;
 
   try {
@@ -46,14 +46,15 @@ async function readFile(
           ),
         );
         break;
-      case "stream":
-        let streamData = await stream(request, routerData.filePath, headers);
+      case "stream": {
+        const streamData = await stream(request, routerData.filePath, headers);
 
         data = streamData.data;
         status = streamData.status;
 
         await runner.run(request, routerData, headers);
         break;
+      }
       case "binary":
         data = await Deno.readFile(routerData.filePath);
 
