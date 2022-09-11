@@ -66,23 +66,47 @@ class Runner {
   async runWithTextData(
     request: Request,
     routerData: RouterData,
-    data: string,
     headers: Record<string, string>,
-  ): Promise<string> {
+    data: string,
+  ): Promise<Uint8Array> {
     const runnablePath = this.getRunnablePath(routerData.domainFilePath);
 
     if (runnablePath) {
-      return await (await import(runnablePath)).default(
-        this.app,
-        request,
-        routerData,
-        headers,
-        data,
-      ) || data;
+      return new TextEncoder().encode(
+        await (await import(runnablePath)).default(
+          this.app,
+          request,
+          routerData,
+          headers,
+          data,
+        ) || data,
+      );
     }
 
-    return data;
+    return new TextEncoder().encode(data);
+  }
+
+  async runWithNothing(
+    request: Request,
+    routerData: RouterData,
+    headers: Record<string, string>,
+  ): Promise<{ data: Uint8Array | null; status: number }> {
+    const runnablePath = this.getRunnablePath(routerData.domainFilePath);
+
+    if (runnablePath) {
+      return {
+        data: await (await import(runnablePath)).default(
+          this.app,
+          request,
+          routerData,
+          headers,
+        ),
+        status: 200,
+      };
+    }
+
+    return { data: null, status: 404 };
   }
 }
 
-export { Runner };
+export { AppRunner, Runner };

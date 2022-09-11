@@ -37,13 +37,11 @@ async function readFile(
   try {
     switch (returnDataType) {
       case "text":
-        data = new TextEncoder().encode(
-          await runner.runWithTextData(
-            request,
-            routerData,
-            await Deno.readTextFile(routerData.filePath),
-            headers,
-          ),
+        data = await runner.runWithTextData(
+          request,
+          routerData,
+          headers,
+          await Deno.readTextFile(routerData.filePath),
         );
         break;
       case "stream": {
@@ -80,28 +78,44 @@ async function handle(conn: Deno.Conn) {
     try {
       const { routerData, subDomainFound } = router.route(request);
 
-      if (subDomainFound && await exists(routerData.filePath)) {
+      if (subDomainFound) {
         const headers = {
           "content-type": Mime.getMimeType(routerData.parsedPath.ext),
         };
-        const { data, status } = await readFile(
-          request,
-          Mime.getReturnDataType(routerData.parsedPath.ext),
-          routerData,
-          headers,
-        );
-        const body = compress(
-          request,
-          data,
-          headers,
-        );
 
-        if (cache.addCacheHeader(request, body, routerData, headers)) {
-          respondWith(new NotModified304()).catch(console.error);
-        } else {
-          respondWith(new Response(body, { headers, status })).catch(
-            console.error,
+        if (await exists(routerData.filePath)) {
+          const { data, status } = await readFile(
+            request,
+            Mime.getReturnDataType(routerData.parsedPath.ext),
+            routerData,
+            headers,
           );
+          const body = compress(
+            request,
+            data,
+            headers,
+          );
+
+          if (cache.addCacheHeader(request, body, routerData, headers)) {
+            respondWith(new NotModified304()).catch(console.error);
+          } else {
+            respondWith(new Response(body, { headers, status })).catch(
+              console.error,
+            );
+          }
+        } else {
+          const runnerData = await runner.runWithNothing(
+            request,
+            routerData,
+            headers,
+          );
+
+          respondWith(
+            new Response(runnerData.data, {
+              headers,
+              status: runnerData.status,
+            }),
+          ).catch(console.error);
         }
       } else respondWith(new Error404()).catch(console.error);
     } catch (error) {
