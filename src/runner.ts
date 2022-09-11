@@ -76,8 +76,8 @@ class Runner {
         this.app,
         request,
         routerData,
-        data,
         headers,
+        data,
       ) || data;
     }
 
