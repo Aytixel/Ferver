@@ -1,4 +1,4 @@
-import { config } from "https://deno.land/x/dotenv@v3.2.0/mod.ts";
+import { config } from "./deps.ts";
 import { Router, RouterData } from "./router.ts";
 import { Mime } from "./mime.ts";
 import { stream } from "./stream.ts";

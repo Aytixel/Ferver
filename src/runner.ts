@@ -1,5 +1,4 @@
-import { DotenvConfig } from "https://deno.land/x/dotenv@v3.2.0/mod.ts";
-import { join, resolve } from "https://deno.land/std@0.152.0/path/mod.ts";
+import { DotenvConfig, join, resolve } from "./deps.ts";
 import { existsSync } from "./utils.ts";
 import { RouterData } from "./router.ts";
 

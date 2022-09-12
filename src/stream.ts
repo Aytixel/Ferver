@@ -1,4 +1,4 @@
-import { readRange } from "https://deno.land/std@0.152.0/io/files.ts";
+import { readRange } from "./deps.ts";
 
 async function stream(
   request: Request,

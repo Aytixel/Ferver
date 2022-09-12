@@ -1,10 +1,5 @@
-import { DotenvConfig } from "https://deno.land/x/dotenv@v3.2.0/mod.ts";
+import { DotenvConfig, join, parse, ParsedPath } from "./deps.ts";
 import { createSubDomainConfig, getJsonSync } from "./utils.ts";
-import {
-  join,
-  parse,
-  ParsedPath,
-} from "https://deno.land/std@0.152.0/path/mod.ts";
 
 interface SubDomainConfig {
   all?: string;

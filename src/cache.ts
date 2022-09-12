@@ -1,4 +1,4 @@
-import etag from "https://cdn.skypack.dev/etag";
+import { etag } from "./deps.ts";
 import { RouterData } from "./router.ts";
 import { createSubDomainConfig, getJsonSync } from "./utils.ts";
 
