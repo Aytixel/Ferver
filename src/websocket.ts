@@ -45,9 +45,10 @@ class WebSocketServer {
     ) return false;
 
     const { socket, response } = Deno.upgradeWebSocket(request);
+    const id = this.id++;
     const connection = {
       socket,
-      id: this.id++,
+      id,
       connections: this.connections,
       data: undefined,
     };
@@ -61,6 +62,12 @@ class WebSocketServer {
         this.message_callback(message, connection, this.runner.app),
     );
     socket.addEventListener("error", console.error);
+    socket.addEventListener("close", () => {
+      for (let i = 0; i < this.connections.length;) {
+        if (this.connections[i].id == id) this.connections.splice(i, 1);
+        else i++;
+      }
+    });
 
     respondWith(response);
 
