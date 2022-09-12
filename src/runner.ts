@@ -13,8 +13,9 @@ class AppRunner {
 }
 
 class Runner {
+  public app: AppRunner;
+
   private env: DotenvConfig;
-  private app: AppRunner;
   private runnablePath: string;
 
   constructor(env: DotenvConfig) {

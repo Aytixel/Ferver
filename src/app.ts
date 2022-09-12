@@ -7,11 +7,13 @@ import { Cache } from "./cache.ts";
 import { Error404, Error500, NotModified304 } from "./status.ts";
 import { Runner } from "./runner.ts";
 import { exists } from "./utils.ts";
+import { WebSocketServer } from "./websocket.ts";
 
 const env = config({ safe: true });
 const router = new Router(env);
 const cache = new Cache();
 const runner = new Runner(env);
+const webSocketServer = new WebSocketServer(env, runner);
 const server = Number(env.ENABLE_SSL)
   ? Deno.listenTls({
     port: Number(env.PORT),
@@ -75,6 +77,8 @@ async function readFile(
 
 async function handle(conn: Deno.Conn) {
   for await (const { request, respondWith } of Deno.serveHttp(conn)) {
+    if (webSocketServer.upgrade(request, respondWith)) continue;
+
     try {
       const { routerData, subDomainFound } = router.route(request);
 
