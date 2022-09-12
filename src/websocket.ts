@@ -62,12 +62,14 @@ class WebSocketServer {
         this.message_callback(message, connection, this.runner.app),
     );
     socket.addEventListener("error", console.error);
-    socket.addEventListener("close", () => {
-      for (let i = 0; i < this.connections.length;) {
-        if (this.connections[i].id == id) this.connections.splice(i, 1);
-        else i++;
-      }
-    });
+    socket.addEventListener(
+      "close",
+      () =>
+        this.connections.splice(
+          this.connections.findIndex((connection) => connection.id == id),
+          1,
+        ),
+    );
 
     respondWith(response);
 
