@@ -1,12 +1,15 @@
 import { DotenvConfig, join, resolve } from "./deps.ts";
 import { existsSync } from "./utils.ts";
 import { RouterData } from "./router.ts";
+import { WebSocketConnectionInfo } from "./websocket.ts";
 
 class AppRunner {
   public env: DotenvConfig;
+  public connections: WebSocketConnectionInfo[];
 
   constructor(env: DotenvConfig) {
     this.env = env;
+    this.connections = [];
   }
 
   async init() {}

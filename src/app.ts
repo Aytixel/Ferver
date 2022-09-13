@@ -13,6 +13,9 @@ const env = config({ safe: true });
 const router = new Router(env);
 const cache = new Cache();
 const runner = new Runner(env);
+
+await runner.runApp();
+
 const webSocketServer = new WebSocketServer(env, runner);
 const server = Number(env.ENABLE_SSL)
   ? Deno.listenTls({
@@ -129,7 +132,5 @@ async function handle(conn: Deno.Conn) {
     }
   }
 }
-
-await runner.runApp();
 
 for await (const conn of server) handle(conn).catch(console.error);

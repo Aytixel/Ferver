@@ -5,12 +5,10 @@ import { existsSync } from "./utils.ts";
 type WebSocketConnectionInfo = {
   socket: WebSocket;
   id: number;
-  connections: WebSocketConnectionInfo[];
   data: unknown;
 };
 
 class WebSocketServer {
-  private connections: WebSocketConnectionInfo[];
   private runner: Runner;
   private message_callback?: (
     message: MessageEvent,
@@ -20,7 +18,6 @@ class WebSocketServer {
   private id = 0;
 
   constructor(env: DotenvConfig, runner: Runner) {
-    this.connections = [];
     this.runner = runner;
 
     for (const extension of ["ts", "tsx", "js", "jsx"]) {
@@ -49,11 +46,11 @@ class WebSocketServer {
     const connection = {
       socket,
       id,
-      connections: this.connections,
+      connections: this.runner.app.connections,
       data: undefined,
     };
 
-    this.connections.push(connection);
+    this.runner.app.connections.push(connection);
 
     socket.addEventListener(
       "message",
@@ -65,8 +62,8 @@ class WebSocketServer {
     socket.addEventListener(
       "close",
       () =>
-        this.connections.splice(
-          this.connections.findIndex((connection) => connection.id == id),
+        this.runner.app.connections.splice(
+          this.runner.app.connections.findIndex((connection) => connection.id == id),
           1,
         ),
     );
