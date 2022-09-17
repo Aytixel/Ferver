@@ -111,17 +111,12 @@ async function handle(conn: Deno.Conn) {
             );
           }
         } else {
-          const runnerData = await runner.runWithNothing(
-            request,
-            routerData,
-            headers,
-          );
-
           respondWith(
-            new Response(runnerData.data, {
+            await runner.runWithNothing(
+              request,
+              routerData,
               headers,
-              status: runnerData.status,
-            }),
+            ),
           ).catch(console.error);
         }
       } else respondWith(new Error404()).catch(console.error);

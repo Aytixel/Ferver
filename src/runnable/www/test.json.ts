@@ -1,5 +1,6 @@
 import { RouterData } from "../../router.ts";
 import { AppRunner } from "../../runner.ts";
+import { Ok200 } from "../../status.ts";
 
 export default function (
   _app: AppRunner,
@@ -7,5 +8,7 @@ export default function (
   _routerData: RouterData,
   _headers: Record<string, string>,
 ) {
-  return new TextEncoder().encode(`{"time": ${Date.now()}}`);
+  return new Ok200(
+    new TextEncoder().encode(`{"time": ${Date.now()}}`),
+  );
 }

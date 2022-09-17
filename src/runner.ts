@@ -2,6 +2,7 @@ import { DotenvConfig, join, resolve } from "./deps.ts";
 import { existsSync } from "./utils.ts";
 import { RouterData } from "./router.ts";
 import { WebSocketConnectionInfo } from "./websocket.ts";
+import { Error404 } from "./status.ts";
 
 class AppRunner {
   public env: DotenvConfig;
@@ -93,22 +94,19 @@ class Runner {
     request: Request,
     routerData: RouterData,
     headers: Record<string, string>,
-  ): Promise<{ data: Uint8Array | null; status: number }> {
+  ): Promise<Response> {
     const runnablePath = this.getRunnablePath(routerData.domainFilePath);
 
     if (runnablePath) {
-      return {
-        data: await (await import(runnablePath)).default(
-          this.app,
-          request,
-          routerData,
-          headers,
-        ),
-        status: 200,
-      };
+      return await (await import(runnablePath)).default(
+        this.app,
+        request,
+        routerData,
+        headers,
+      );
     }
 
-    return { data: null, status: 404 };
+    return new Error404();
   }
 }
 
