@@ -67,7 +67,7 @@ class Router {
         const redirectionPath in subDomainConfig
       ) {
         const subDomainConfigRegExp = subDomainConfig[redirectionPath];
-        const regExpPassed = [0, 0, 0]; // 0 = not have to be test, 1 = have to be test, 2 = tested true
+        const regExpPassed = [0, 0, 0]; // 0 = not have to be test, 1 = tested false, 2 = tested true
 
         if (typeof subDomainConfigRegExp.all === "string") {
           regExpPassed[0] = RegExp(subDomainConfigRegExp.all, "i").test(
