@@ -1,13 +1,15 @@
 import { RouterData } from "../../../router.ts";
-import { AppRunner } from "../../../runner.ts";
+import { AppRunner, RedirectTo, RespondWith } from "../../../runner.ts";
 
 export default function (
   _app: AppRunner,
   _request: Request,
   routerData: RouterData,
   _headers: Record<string, string>,
+  _respondWith: RespondWith,
+  redirectTo: RedirectTo,
 ) {
   console.log("Redirection test");
 
-  return Response.redirect(routerData.url.origin + "/");
+  redirectTo(routerData.url.origin + "/");
 }
